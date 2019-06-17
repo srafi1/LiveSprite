@@ -25,9 +25,10 @@ class Login extends Component {
     if (this.validInput(this.state.usernameL) && this.validInput(this.state.passwordL)) {
       this.setState({loginErrors:[]});
       login(this.state.usernameL, this.state.passwordL)
+        .then(res => res.data)
         .then((res) => {
           if (res.success) {
-            console.log("redirect to profile");
+            window.location = '/profile';
           } else {
             this.setState({loginErrors:[res.warning]});
           }
@@ -35,10 +36,10 @@ class Login extends Component {
     } else {
       let errors = [];
       if (!this.validInput(this.state.usernameL)) {
-        errors.push("Username is required");
+        errors.push('Username is required');
       }
       if (!this.validInput(this.state.passwordL)) {
-        errors.push("Password is required");
+        errors.push('Password is required');
       }
       this.setState({loginErrors:errors});
     }
@@ -52,9 +53,10 @@ class Login extends Component {
       this.state.confirmPasswordR === this.state.passwordR) {
       this.setState({registerErrors:[]});
       register(this.state.usernameR, this.state.passwordR, this.state.passwordR)
+        .then(res => res.data)
         .then((res) => {
           if (res.success) {
-            console.log("redirect to profile");
+            window.location = '/profile';
           } else {
             this.setState({registerErrors:[res.warning]});
           }
@@ -62,16 +64,16 @@ class Login extends Component {
     } else {
       let errors = [];
       if (!this.validInput(this.state.usernameR)) {
-        errors.push("Username is required");
+        errors.push('Username is required');
       }
       if (!this.validInput(this.state.passwordR)) {
-        errors.push("Password is required");
+        errors.push('Password is required');
       }
       if (!this.validInput(this.state.confirmPasswordR)) {
-        errors.push("Confirm Password is required");
+        errors.push('Confirm Password is required');
       }
       if (this.state.confirmPasswordR !== this.state.passwordR) {
-        errors.push("Passwords must match");
+        errors.push('Passwords must match');
       }
       this.setState({registerErrors:errors});
     }
