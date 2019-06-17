@@ -1,7 +1,7 @@
 package backend;
 
 import com.blade.Blade;
- 
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -16,6 +16,7 @@ public class App {
 
     private static SessionFactory sessionFactory;
     private static ServiceRegistry serviceRegistry;
+    private static final int PORT = 5000;
 
     public static void main(String[] args) {
 
@@ -30,7 +31,7 @@ public class App {
         } catch (Exception e) {
             System.err.println("Initial SessionFactory creation failed." + e);
             throw new ExceptionInInitializerError(e);
-        }  
+        }
 
         Blade server = Blade.of();
 
@@ -47,25 +48,25 @@ public class App {
             criteria.add(Restrictions.eq("username", username));
             List<User> results = criteria.list();
             if (username == null || username.length() == 0) {
-                ctx.json("{success:false,warning:'Username is required'}");
+                ctx.json("{\"success\":false,\"warning\":\"Username is required\"}");
             } else if (password == null || password.length() == 0) {
-                ctx.json("{success:false,warning:'Password is required'}");
+                ctx.json("{\"success\":false,\"warning\":\"Password is required\"}");
             } else if (results.size() > 0) {
-                ctx.json("{success:false,warning:'That username is taken'}");
+                ctx.json("{\"success\":false,\"warning\":\"That username is taken\"}");
             } else if (!password.equals(confirmPassword)) {
-                ctx.json("{success:false,warning:'Passwords must match'}");
+                ctx.json("{\"success\":false,\"warning\":\"Passwords must match\"}");
             } else {
                 session.beginTransaction();
                 session.save(new User(username, password));
                 session.getTransaction().commit();
-                session.close();
                 System.out.println("created user: " + username + " " + password);
                 Criteria criteria2 = session.createCriteria(User.class);
                 criteria2.add(Restrictions.eq("username", username));
                 results = criteria2.list();
                 ctx.cookie("user_id", String.valueOf(results.get(0).getId()));
-                ctx.json("{success:true,warning:''}");
+                ctx.json("{success:true,warning:\"\"}");
             }
+            session.close();
         });
 
         server.get("/api/login", ctx -> {
@@ -77,27 +78,27 @@ public class App {
             criteria.add(Restrictions.eq("username", username));
             List<User> results = criteria.list();
             if (username == null || username.length() == 0) {
-                ctx.json("{success:false,warning:'Username is required'}");
+                ctx.json("{\"success\":false,\"warning\":\"Username is required\"}");
             } else if (password == null || password.length() == 0) {
-                ctx.json("{success:false,warning:'Password is required'}");
+                ctx.json("{\"success\":false,\"warning\":\"Password is required\"}");
             } else if (results.size() == 0 || !results.get(0).getPassword().equals(password)) {
-                ctx.json("{success:false,warning:'Invalid login'}");
+                ctx.json("{\"success\":false,\"warning\":\"Invalid login\"}");
             } else {
                 ctx.cookie("user_id", String.valueOf(results.get(0).getId()));
-                ctx.json("{success:true,warning:''}");
+                ctx.json("{\"success\":true,\"warning\":\"\"}");
             }
             session.close();
         });
 
-        server.listen(3000)
+        server.listen(PORT)
             .start();
 
-        Runtime.getRuntime().addShutdownHook(new Thread() { 
-            public void run() 
-            { 
-                System.out.println("Shutdown Hook is running !"); 
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run()
+            {
+                System.out.println("Shutdown Hook is running !");
                 sessionFactory.close();
-            } 
-        }); 
+            }
+        });
     }
 }
