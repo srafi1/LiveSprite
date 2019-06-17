@@ -35,7 +35,7 @@ public class App {
         Blade server = Blade.of();
 
         server.get("/api", ctx -> {
-            ctx.text("Hello World!");
+            ctx.text("LiveSprite API");
         });
 
         server.get("/api/register", ctx -> {
@@ -60,6 +60,10 @@ public class App {
                 session.getTransaction().commit();
                 session.close();
                 System.out.println("created user: " + username + " " + password);
+                Criteria criteria2 = session.createCriteria(User.class);
+                criteria2.add(Restrictions.eq("username", username));
+                results = criteria2.list();
+                ctx.cookie("user_id", String.valueOf(results.get(0).getId()));
                 ctx.json("{success:true,warning:''}");
             }
         });
@@ -79,6 +83,7 @@ public class App {
             } else if (results.size() == 0 || !results.get(0).getPassword().equals(password)) {
                 ctx.json("{success:false,warning:'Invalid login'}");
             } else {
+                ctx.cookie("user_id", String.valueOf(results.get(0).getId()));
                 ctx.json("{success:true,warning:''}");
             }
             session.close();
