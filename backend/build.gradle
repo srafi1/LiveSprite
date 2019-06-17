@@ -18,6 +18,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     compile 'com.bladejava:blade-mvc:2.0.15.ALPHA'
+    compile 'org.hibernate:hibernate-core:5.4.3.Final'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.11'
 }
 
 // Define the main class for the application
