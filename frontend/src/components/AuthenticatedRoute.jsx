@@ -1,19 +1,24 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
-import { authenticate, isAuthenticated } from '../utilities/auth'
+import { isAuthenticated, redirectToLogin } from '../utilities/auth'
 
 class AuthenticateBeforeRender extends Component {
-  state = {
-    isAuthenticated: false,
+  constructor(props) {
+    super(props);
+    this.state = {
+      isAuthenticated: false,
+    }
   }
 
   componentDidMount() {
-    authenticate().then(isAuthenticated => {
-      this.setState({ isAuthenticated })
-    })
+    if (isAuthenticated()) {
+      this.setState({isAuthenticated:true})
+    } else {
+      redirectToLogin();
+    }
   }
 
-  render() {
+  render = () => {
     return this.state.isAuthenticated ? this.props.render() : null
   }
 }
