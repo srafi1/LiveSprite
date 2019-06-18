@@ -19,9 +19,9 @@ public class App {
     private static final int PORT = 5000;
 
     public static void main(String[] args) {
-
         Configuration conf = new Configuration();
         conf.addAnnotatedClass(User.class);
+        conf.addAnnotatedClass(Animation.class);
         conf.configure();
         serviceRegistry = new StandardServiceRegistryBuilder().applySettings(conf.getProperties()).build();
         sessionFactory = conf.buildSessionFactory(serviceRegistry);
@@ -64,7 +64,7 @@ public class App {
                 criteria2.add(Restrictions.eq("username", username));
                 results = criteria2.list();
                 ctx.cookie("user_id", String.valueOf(results.get(0).getId()));
-                ctx.json("{success:true,warning:\"\"}");
+                ctx.json("{\"success\":true,\"uid\":\"" + results.get(0).getId() + "\"}");
             }
             session.close();
         });
@@ -85,20 +85,34 @@ public class App {
                 ctx.json("{\"success\":false,\"warning\":\"Invalid login\"}");
             } else {
                 ctx.cookie("user_id", String.valueOf(results.get(0).getId()));
-                ctx.json("{\"success\":true,\"warning\":\"\"}");
+                ctx.json("{\"success\":true,\"uid\":\"" + results.get(0).getId() + "\"}");
+            }
+            session.close();
+        });
+
+        server.get("/api/new", ctx -> {
+            long uid = Long.parseLong(ctx.cookie("user_id"));
+            String projectName = ctx.fromString("name");
+            int width = ctx.fromInt("width");
+            int height = ctx.fromInt("height");
+            Session session = sessionFactory.openSession();
+            Criteria criteria = session.createCriteria(User.class);
+            criteria.add(Restrictions.eq("id", uid));
+            List<User> results = criteria.list();
+            if (results.size() == 0) {
+                ctx.json("{\"success\":false,\"warning\":\"no user id found\"}");
+            } else {
+                Animation anim = new Animation(results.get(0), projectName, width, height);
+                session.beginTransaction();
+                session.save(anim);
+                session.getTransaction().commit();
+                System.out.println("new animation id is: " + anim.getId());
+                ctx.json("{\"success\":true,\"anim_id\":" + anim.getId() + "}");
             }
             session.close();
         });
 
         server.listen(PORT)
             .start();
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run()
-            {
-                System.out.println("Shutdown Hook is running !");
-                sessionFactory.close();
-            }
-        });
     }
 }

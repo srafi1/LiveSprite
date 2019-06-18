@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -15,7 +16,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "user_id")
     private long id;
 
     @Column(name = "username")
@@ -24,12 +25,14 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    public User() { }
+    @OneToMany(mappedBy="owner")
+    private Set<Animation> animations;
+
+    public User() {  }
 
     public User(String uname, String pword) {
         this.username = uname;
-        this.password = pword;
-    }
+        this.password = pword; }
 
     public long getId() {
         return id;
@@ -53,5 +56,9 @@ public class User {
 
     public void setPassword(String pword) {
         this.password = pword;
+    }
+
+    public Set<Animation> getAnimations() {
+        return animations;
     }
 }
