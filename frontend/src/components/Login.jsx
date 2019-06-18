@@ -84,7 +84,7 @@ class Login extends Component {
 
     return (
       <div className="flex-container">
-        <div>
+        <div className="border-right">
           <form onSubmit={this.loginHandler}>
             <table>
               <thead>

@@ -15,7 +15,7 @@ public class Animation {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column(name="project_id")
+    @Column(name="id")
     private long id;
 
     @ManyToOne
@@ -25,19 +25,15 @@ public class Animation {
     @Column(name="name")
     private String name;
 
-    @Column(name="width")
-    private int width;
-
-    @Column(name="height")
-    private int height;
+    @Column(name="data")
+    private String data;
 
     public Animation() {  }
 
-    public Animation(User nuser, String nname, int nwidth, int nheight) {
+    public Animation(User nuser, String nname, String ndata) {
         this.owner = nuser;
         this.name = nname;
-        this.width = nwidth;
-        this.height = nheight;
+        this.data = ndata;
     }
 
     public long getId() {
@@ -64,19 +60,17 @@ public class Animation {
         this.name = nname;
     }
 
-    public int getWidth() {
-        return width;
+    public String getData() {
+        return data;
     }
 
-    public void setWidth(int nwidth) {
-        this.width = nwidth;
+    public void setData(String ndata) {
+        this.data = ndata;
     }
 
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int nheight) {
-        this.height = nheight;
+    public String getJSON() {
+        String ret = "{\"name\":\"" + name + "\"";
+        ret += ",\"id\":" + id + "}";
+        return ret;
     }
 }

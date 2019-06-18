@@ -90,11 +90,9 @@ public class App {
             session.close();
         });
 
-        server.get("/api/new", ctx -> {
+        server.post("/api/new", ctx -> {
             long uid = Long.parseLong(ctx.cookie("user_id"));
-            String projectName = ctx.fromString("name");
-            int width = ctx.fromInt("width");
-            int height = ctx.fromInt("height");
+            String data = ctx.request().bodyToString();
             Session session = sessionFactory.openSession();
             Criteria criteria = session.createCriteria(User.class);
             criteria.add(Restrictions.eq("id", uid));
@@ -102,17 +100,47 @@ public class App {
             if (results.size() == 0) {
                 ctx.json("{\"success\":false,\"warning\":\"no user id found\"}");
             } else {
-                Animation anim = new Animation(results.get(0), projectName, width, height);
+                Animation anim = new Animation(results.get(0), "New Project", data);
                 session.beginTransaction();
                 session.save(anim);
                 session.getTransaction().commit();
-                System.out.println("new animation id is: " + anim.getId());
                 ctx.json("{\"success\":true,\"anim_id\":" + anim.getId() + "}");
             }
             session.close();
         });
 
-        server.listen(PORT)
-            .start();
+        server.get("/api/animations", ctx -> {
+            long uid = Long.parseLong(ctx.cookie("user_id"));
+            Session session = sessionFactory.openSession();
+            Criteria criteria = session.createCriteria(User.class);
+            criteria.add(Restrictions.eq("id", uid));
+            List<User> results = criteria.list();
+            //Animation[] anims = results.get(0).getAnimations().toArray();
+            String response = "[ ";
+            for (Animation anim : results.get(0).getAnimations()) {
+                response += anim.getJSON() + ",";
+            }
+            response = response.substring(0, response.length()-1) + "]";
+            ctx.json(response);
+            session.close();
+        });
+
+        server.get("/api/animation/:anim_id", ctx -> {
+            System.out.println("DEBUG: " + ctx.pathString(":anim_id"));
+            long uid = Long.parseLong(ctx.cookie("user_id"));
+            long animId = ctx.pathLong(":anim_id");
+            Session session = sessionFactory.openSession();
+            Criteria criteria = session.createCriteria(Animation.class);
+            criteria.add(Restrictions.eq("id", animId));
+            List<Animation> results = criteria.list();
+            Animation anim = results.get(0);
+            if (anim.getOwner().getId() != uid) {
+                ctx.json("{\"success\":false,\"warning\":\"Unauthorized\"}");
+            } else {
+                ctx.json("{\"success\":true,\"animation\":" + anim.getData() + "}");
+            }
+        });
+
+        server.listen(PORT).start();
     }
 }
