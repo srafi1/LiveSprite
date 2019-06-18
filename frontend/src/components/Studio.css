@@ -1,0 +1,29 @@
+.panel {
+  background-color: #444;
+  max-width: 20%;
+  margin: 20px;
+  padding: 20px;
+  text-align: center;
+}
+
+.panel h2 {
+  margin-top: 0px;
+}
+
+.view {
+  background-color: #444;
+  max-width: 50%;
+  overflow: auto;
+  margin: 20px;
+}
+
+.cell {
+  width: 30px;
+  height: 30px;
+  padding: 0px;
+  margin: 0px;
+}
+
+.bordered {
+  border: 1px solid black;
+}

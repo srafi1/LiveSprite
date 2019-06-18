@@ -47,7 +47,7 @@ nav a:hover {
 .flex-container {
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-around;
+  justify-content: center;
 }
 
 td {
@@ -62,4 +62,19 @@ td {
 
 .centered {
   text-align: center;
+}
+
+.border-right {
+  border-right: 1px solid white;
+  margin-right: 20px;
+  padding-right: 20px;
+}
+
+.highlight {
+  color: #F08080;
+  cursor: pointer;
+}
+
+.icon {
+  width: 20px;
 }
