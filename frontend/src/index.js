@@ -7,7 +7,10 @@ import { AuthenticatedRoute } from './components/AuthenticatedRoute';
 import { isAuthenticated } from './utilities/auth';
 import Home from './components/Home';
 import Login from './components/Login';
+import Logout from './components/Logout';
 import Profile from './components/Profile';
+import NewProject from './components/NewProject';
+import Studio from './components/Studio';
 import './index.css';
 
 let nav;
@@ -18,7 +21,9 @@ if (isAuthenticated()) {
         <Link to="/">Home</Link>
       </div>
       <div>
+        <Link to="/new">New Project</Link>
         <Link to="/profile">Profile</Link>
+        <Link to="/logout">Logout</Link>
       </div>
     </nav>
     );
@@ -41,7 +46,10 @@ const router = (
 
     <Route exact path="/" component={Home} />
     <Route path="/login" component={Login} />
+    <Route path="/logout" component={Logout} />
     <AuthenticatedRoute path="/profile" component={Profile} />
+    <AuthenticatedRoute path="/new" component={NewProject} />
+    <AuthenticatedRoute path="/studio/:id" component={Studio} />
   </Router>
 );
 
