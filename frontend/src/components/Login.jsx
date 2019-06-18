@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { login, register } from '../utilities/auth'
+import { isAuthenticated, login, register } from '../utilities/auth'
 
 class Login extends Component {
   constructor(props) {
@@ -17,7 +17,7 @@ class Login extends Component {
   }
 
   validInput = (s) => {
-    return s && s !== "";
+    return s && s !== '';
   }
 
   loginHandler = (e) => {
@@ -25,7 +25,6 @@ class Login extends Component {
     if (this.validInput(this.state.usernameL) && this.validInput(this.state.passwordL)) {
       this.setState({loginErrors:[]});
       login(this.state.usernameL, this.state.passwordL)
-        .then(res => res.data)
         .then((res) => {
           if (res.success) {
             window.location = '/profile';
@@ -53,7 +52,6 @@ class Login extends Component {
       this.state.confirmPasswordR === this.state.passwordR) {
       this.setState({registerErrors:[]});
       register(this.state.usernameR, this.state.passwordR, this.state.passwordR)
-        .then(res => res.data)
         .then((res) => {
           if (res.success) {
             window.location = '/profile';
@@ -80,6 +78,10 @@ class Login extends Component {
   }
 
   render = () => {
+    if (isAuthenticated()) {
+      window.location = '/profile';
+    }
+
     return (
       <div className="flex-container">
         <div>
