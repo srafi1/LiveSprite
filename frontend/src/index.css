@@ -78,3 +78,9 @@ td {
 .icon {
   width: 20px;
 }
+
+.flex-sides {
+  margin: 10px;
+  display: flex;
+  justify-content: space-between;
+}

@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Tool from './Tool';
 import { SketchPicker } from 'react-color';
+import  Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 import './Studio.css';
 import editIcon from './edit-icon.png';
 import eraseIcon from './erase-icon.png';
@@ -43,7 +45,7 @@ class Studio extends Component {
     return ret;
   }
 
-  generateViewFromState = (frame) => {
+  generateViewFromState = () => {
     let view = [];
     for (let i = 0; i < 16; i++) {
       let row = [];
@@ -57,10 +59,16 @@ class Studio extends Component {
       }
       view.push(row);
     }
+    /*
+     *console.log('view init');
+     *console.log(view);
+     */
 
-    if (!frame) {
-      frame = this.state.anim.frames[this.state.activeFrame]; 
-    }
+    let frame = this.state.anim.frames[this.state.activeFrame]; 
+    /*
+     *console.log('frame to render');
+     *console.log(frame);
+     */
     for (let i = 0; i < frame.layers.length; i++) {
       let layer = frame.layers[i];
       if (!layer.visible) continue; 
@@ -73,14 +81,23 @@ class Studio extends Component {
         }
       }
     }
+    /*
+     *console.log('view post layers');
+     *console.log(view);
+     */
 
     for (let y = 0; y < view.length; y++) {
       for (let x = 0; x < view[y].length; x++) {
         if (view[y][x].visible) {
+          //console.log(`Active pixel: ${x} ${y}`);
           view[y][x].colorHex = this.genHex(view[y][x]);
         }
       }
     }
+    /*
+     *console.log('view post hex');
+     *console.log(view);
+     */
 
     return view;
   }
@@ -107,6 +124,10 @@ class Studio extends Component {
     const activeLayer = this.state.activeLayer;
     let newAnim = { ...this.state.anim };
     newAnim.frames[activeFrame].layers[activeLayer].pixels[y][x] = newCell;
+    /*
+     *console.log('new anim:');
+     *console.log(newAnim);
+     */
     this.setState({anim:newAnim});
   }
 
@@ -121,6 +142,7 @@ class Studio extends Component {
   cellClick = (e) => {
     const x = parseInt(e.target.getAttribute('x'));
     const y = parseInt(e.target.getAttribute('y'));
+    //console.log(`Clicked ${x} ${y}`);
     switch (this.state.activeTool) {
       case 'Pencil':
         this.fillCell(x, y);
@@ -179,6 +201,35 @@ class Studio extends Component {
     }
   }
 
+  frameChange = (value) => {
+    this.setState({activeFrame:value});
+  }
+
+  addFrame = () => {
+    let newFrame = {
+      layers: [{
+        pixels: [],
+        visible: true
+      }]
+    };
+    for (let i = 0; i < 16; i++) {
+      let row = [];
+      for (let j = 0; j < 16; j++) {
+        row.push({
+          r: 0,
+          g: 0,
+          b: 0,
+          visible: false
+        });
+      }
+      newFrame.layers[0].pixels.push(row);
+    }
+    let newAnim = { ...this.state.anim };
+    newAnim.frames.push(newFrame);
+    this.setState({anim:newAnim});
+    this.setState({activeFrame:this.state.activeFrame+1})
+  }
+
   render = () => {
     if (this.state.loading) {
       return (
@@ -187,6 +238,7 @@ class Studio extends Component {
         </div>
         );
     } else {
+      //console.log(this.state);
       let view = this.generateViewFromState();
       return (
         <div>
@@ -244,6 +296,20 @@ class Studio extends Component {
             </div>
             <div className="panel">
               <h2>Animation Controller</h2>
+              <Slider 
+                min={0} 
+                max={this.state.anim.frames.length-1} 
+                value={this.state.activeFrame} 
+                onChange={this.frameChange}
+              />
+              <div className="flex-sides">
+                <span>Frame: {this.state.activeFrame}</span>
+                <span>Total Frames: {this.state.anim.frames.length}</span>
+              </div>
+              <div className="flex-sides">
+                <button className="button" onClick={this.addFrame}>Add Frame</button>
+                <button className="button" onClick={this.deleteFrame}>Delete Frame</button>
+              </div>
             </div>
           </div>
         </div>
