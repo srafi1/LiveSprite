@@ -14,7 +14,6 @@ class Profile extends Component {
     axios.get('/api/animations/')
       .then(res => res.data)
       .then(res => {
-        console.log(res);
         this.setState({
           loading: false,
           animations: res

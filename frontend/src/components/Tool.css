@@ -1,0 +1,13 @@
+.tool {
+  border: 1px solid white;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 5px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.active {
+  background-color: #F08080;
+}
