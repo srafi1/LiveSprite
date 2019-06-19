@@ -32,6 +32,7 @@ nav a:hover {
 .button {
   display: inline-block;
   padding: 10px;
+  margin: 0px 5px 0px 5px;
   background-color: #F08080;
   border-radius: 5px;
   color: white;

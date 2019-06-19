@@ -27,3 +27,11 @@
 .bordered {
   border: 1px solid black;
 }
+
+.title {
+  font-size: 2em;
+}
+
+.preview {
+  width: 100px;
+}

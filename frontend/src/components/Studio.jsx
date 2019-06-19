@@ -8,6 +8,7 @@ import 'rc-slider/assets/index.css';
 import './Studio.css';
 import editIcon from './edit-icon.png';
 import eraseIcon from './erase-icon.png';
+import generateGIF from '../utilities/gif';
 
 class Studio extends Component {
   constructor(props) {
@@ -291,6 +292,16 @@ class Studio extends Component {
     this.setState({activeLayer:i});
   }
 
+  exportAnim = () => {
+    let gif = generateGIF(this.state.anim);
+    gif.on('finished', (blob) => {
+      console.log('completed gif generation');
+      let url = URL.createObjectURL(blob);
+      this.setState({generatedGifSrc:url});
+    });
+    gif.render();
+  }
+
   render = () => {
     if (this.state.loading) {
       return (
@@ -304,11 +315,12 @@ class Studio extends Component {
       return (
         <div>
           <div>
-            <h1 className="highlight" onClick={this.changeName}>
+            <span className="highlight title" onClick={this.changeName}>
               { this.state.anim.name } &nbsp;
               <img className="icon" src={editIcon} alt="edit" />
-            </h1>
+            </span>
             <button className="button" onClick={this.saveAnim}>Save</button>
+            <button className="button" onClick={this.exportAnim}>Export</button>
             <p>&nbsp;{ this.state.message }</p>
           </div>
           <div className="flex-container">
@@ -386,6 +398,7 @@ class Studio extends Component {
                 <button className="button" onClick={this.addLayer}>Add Layer</button>
                 <button className="button" onClick={this.deleteLayer}>Delete Layer</button>
               </div>
+              { this.state.generatedGifSrc ? [<p>Preview</p>,<img className="preview" src={this.state.generatedGifSrc} alt="generated gif" />] : [] }
             </div>
           </div>
         </div>
