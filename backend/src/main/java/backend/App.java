@@ -126,7 +126,6 @@ public class App {
         });
 
         server.get("/api/animation/:anim_id", ctx -> {
-            System.out.println("DEBUG: " + ctx.pathString(":anim_id"));
             long uid = Long.parseLong(ctx.cookie("user_id"));
             long animId = ctx.pathLong(":anim_id");
             Session session = sessionFactory.openSession();
@@ -139,6 +138,29 @@ public class App {
             } else {
                 ctx.json("{\"success\":true,\"animation\":" + anim.getData() + "}");
             }
+        });
+
+        server.post("/api/animation/:anim_id/:new_anim_name", ctx -> {
+            long uid = Long.parseLong(ctx.cookie("user_id"));
+            long animId = ctx.pathLong(":anim_id");
+            String data = ctx.request().bodyToString();
+            String animName = ctx.pathString(":new_anim_name");
+            Session session = sessionFactory.openSession();
+            Criteria criteria = session.createCriteria(Animation.class);
+            criteria.add(Restrictions.eq("id", animId));
+            List<Animation> results = criteria.list();
+            Animation anim = results.get(0);
+            if (anim.getOwner().getId() != uid) {
+                ctx.json("Must own project to save");
+            } else {
+                session.beginTransaction();
+                anim.setData(data);
+                anim.setName(animName);
+                session.save(anim);
+                session.getTransaction().commit();
+                ctx.json("Saved successfully");
+            }
+            session.close();
         });
 
         server.listen(PORT).start();
