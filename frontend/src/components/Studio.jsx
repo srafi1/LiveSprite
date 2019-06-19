@@ -226,8 +226,21 @@ class Studio extends Component {
     }
     let newAnim = { ...this.state.anim };
     newAnim.frames.push(newFrame);
-    this.setState({anim:newAnim});
-    this.setState({activeFrame:this.state.activeFrame+1})
+    this.setState({anim:newAnim, activeFrame:this.state.activeFrame+1});
+  }
+
+  deleteFrame = () => {
+    if (this.state.anim.frames.length === 1) {
+      alert('Must have at least one frame');
+      return;
+    }
+    let newAnim = { ...this.state.anim };
+    newAnim.frames.splice(this.state.activeFrame, 1);
+    let newFrame = this.state.activeFrame - 1;
+    if (newFrame < 0) {
+      newFrame = 0;
+    }
+    this.setState({anim:newAnim, activeFrame:newFrame});
   }
 
   render = () => {
