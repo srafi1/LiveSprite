@@ -294,6 +294,28 @@ class Studio extends Component {
     this.setState({activeLayer:i});
   }
 
+  moveLayerUp = (i) => () => {
+    if (i === 0) {
+      return;
+    }
+    let newAnim = { ...this.state.anim };
+    let tmpLayer = newAnim.frames[this.state.activeFrame].layers[i];
+    newAnim.frames[this.state.activeFrame].layers[i] = newAnim.frames[this.state.activeFrame].layers[i-1];
+    newAnim.frames[this.state.activeFrame].layers[i-1] = tmpLayer;
+    this.setState({anim:newAnim});
+  }
+
+  moveLayerDown = (i) => () => {
+    if (i === this.state.anim.frames[this.state.activeFrame].layers.length-1) {
+      return;
+    }
+    let newAnim = { ...this.state.anim };
+    let tmpLayer = newAnim.frames[this.state.activeFrame].layers[i];
+    newAnim.frames[this.state.activeFrame].layers[i] = newAnim.frames[this.state.activeFrame].layers[i+1];
+    newAnim.frames[this.state.activeFrame].layers[i+1] = tmpLayer;
+    this.setState({anim:newAnim});
+  }
+
   previewAnim = () => {
     let gif = generateGIF(this.state.anim);
     gif.on('finished', (blob) => {
@@ -398,6 +420,8 @@ class Studio extends Component {
                 visible={layer.visible}
                 toggleVisibility={this.toggleVisibility(i)}
                 changeActiveLayer={this.changeActiveLayer(i)}
+                moveLayerUp={this.moveLayerUp(i)}
+                moveLayerDown={this.moveLayerDown(i)}
               />
               )) }
               <div className="flex-sides">
