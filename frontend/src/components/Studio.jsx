@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Tool from './Tool';
+import LayerCard from './LayerCard';
 import { SketchPicker } from 'react-color';
 import  Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
@@ -64,14 +65,14 @@ class Studio extends Component {
      *console.log(view);
      */
 
-    let frame = this.state.anim.frames[this.state.activeFrame]; 
+    let frame = this.state.anim.frames[this.state.activeFrame];
     /*
      *console.log('frame to render');
      *console.log(frame);
      */
     for (let i = 0; i < frame.layers.length; i++) {
       let layer = frame.layers[i];
-      if (!layer.visible) continue; 
+      if (!layer.visible) continue;
       layer = layer.pixels;
       for (let y = 0; y < layer.length; y++) {
         for (let x = 0; x < layer.length; x++) {
@@ -243,6 +244,53 @@ class Studio extends Component {
     this.setState({anim:newAnim, activeFrame:newFrame});
   }
 
+  addLayer = () => {
+    let newLayer = {
+      pixels: [],
+      visible: true
+    };
+    for (let i = 0; i < 16; i++) {
+      let row = [];
+      for (let j = 0; j < 16; j++) {
+        row.push({
+          r: 0,
+          g: 0,
+          b: 0,
+          visible: false
+        });
+      }
+      newLayer.pixels.push(row);
+    }
+    let newAnim = { ...this.state.anim };
+    newAnim.frames[this.state.activeFrame].layers.push(newLayer);
+    this.setState({anim:newAnim, activeLayer:this.state.activeLayer+1});
+  }
+
+  deleteLayer = () => {
+    if (this.state.anim.frames[this.state.activeFrame].layers.length === 1) {
+      alert('Must have at least one layer');
+      return;
+    }
+    let newAnim = { ...this.state.anim };
+    newAnim.frames[this.state.activeFrame].layers.splice(this.state.activeLayer, 1);
+    let newLayer = this.state.activeLayer - 1;
+    if (newLayer < 0) {
+      newLayer = 0;
+    }
+    this.setState({anim:newAnim, activeLayer:newLayer});
+  }
+
+  toggleVisibility = (i) => () => {
+    let newAnim = { ...this.state.anim };
+    let visible = newAnim.frames[this.state.activeFrame].layers[i].visible;
+    newAnim.frames[this.state.activeFrame].layers[i].visible = !visible;
+    this.setState({anim:newAnim});
+  }
+
+  changeActiveLayer = (i) => () => {
+    this.setState({activeLayer:i});
+  }
+
   render = () => {
     if (this.state.loading) {
       return (
@@ -257,7 +305,7 @@ class Studio extends Component {
         <div>
           <div>
             <h1 className="highlight" onClick={this.changeName}>
-              { this.state.anim.name }
+              { this.state.anim.name } &nbsp;
               <img className="icon" src={editIcon} alt="edit" />
             </h1>
             <button className="button" onClick={this.saveAnim}>Save</button>
@@ -266,20 +314,20 @@ class Studio extends Component {
           <div className="flex-container">
             <div className="panel">
               <h2>Drawing tools</h2>
-              <SketchPicker 
+              <SketchPicker
                 color={this.state.color}
                 onChangeComplete={this.colorChange}
                 disableAlpha={true}
               />
-              <Tool 
-                toolName="Pencil" 
-                icon={editIcon} 
+              <Tool
+                toolName="Pencil"
+                icon={editIcon}
                 activeTool={this.state.activeTool}
                 onClick={this.changeTool}
               />
-              <Tool 
-                toolName="Eraser" 
-                icon={eraseIcon} 
+              <Tool
+                toolName="Eraser"
+                icon={eraseIcon}
                 activeTool={this.state.activeTool}
                 onClick={this.changeTool}
               />
@@ -288,12 +336,12 @@ class Studio extends Component {
             <div className="view">
               <table>
                 <tbody>
-                  { view.map((row, y) => 
+                  { view.map((row, y) =>
                   <tr key={y}>
-                    { row.map((cell, x) => 
-                    <td 
-                      className="cell" 
-                      key={x} 
+                    { row.map((cell, x) =>
+                    <td
+                      className="cell"
+                      key={x}
                       x={x}
                       y={y}
                       style={cell.visible ? {backgroundColor:cell.colorHex}: {}}
@@ -308,20 +356,35 @@ class Studio extends Component {
               </table>
             </div>
             <div className="panel">
-              <h2>Animation Controller</h2>
-              <Slider 
-                min={0} 
-                max={this.state.anim.frames.length-1} 
-                value={this.state.activeFrame} 
+              <h2>Frame Controller</h2>
+              <Slider
+                min={0}
+                max={this.state.anim.frames.length-1}
+                value={this.state.activeFrame}
                 onChange={this.frameChange}
               />
               <div className="flex-sides">
-                <span>Frame: {this.state.activeFrame}</span>
+                <span>Frame: {this.state.activeFrame+1}</span>
                 <span>Total Frames: {this.state.anim.frames.length}</span>
               </div>
               <div className="flex-sides">
                 <button className="button" onClick={this.addFrame}>Add Frame</button>
                 <button className="button" onClick={this.deleteFrame}>Delete Frame</button>
+              </div>
+              <h2>Layer Controller</h2>
+              { this.state.anim.frames[this.state.activeFrame].layers.map((layer, i) => (
+                <LayerCard
+                key={i}
+                activeLayer={this.state.activeLayer+1}
+                layerNum={i+1}
+                visible={layer.visible}
+                toggleVisibility={this.toggleVisibility(i)}
+                changeActiveLayer={this.changeActiveLayer(i)}
+              />
+              )) }
+              <div className="flex-sides">
+                <button className="button" onClick={this.addLayer}>Add Layer</button>
+                <button className="button" onClick={this.deleteLayer}>Delete Layer</button>
               </div>
             </div>
           </div>
