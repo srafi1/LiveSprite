@@ -106,12 +106,14 @@ class Studio extends Component {
 
   changeName = () => {
     let newName = prompt('New project name: ');
-    if (newName === '') {
+    if (!newName) {
+      return;
+    } else if (newName.trim() === '') {
       alert('Cannot use empty name');
       return;
     }
     let newAnim = { ...this.state.anim };
-    newAnim.name = newName;
+    newAnim.name = newName.trim();
     this.setState({anim:newAnim});
   }
 
@@ -292,7 +294,7 @@ class Studio extends Component {
     this.setState({activeLayer:i});
   }
 
-  exportAnim = () => {
+  previewAnim = () => {
     let gif = generateGIF(this.state.anim);
     gif.on('finished', (blob) => {
       console.log('completed gif generation');
@@ -300,6 +302,10 @@ class Studio extends Component {
       this.setState({generatedGifSrc:url});
     });
     gif.render();
+  }
+
+  stopGif = () => {
+    this.setState({generatedGifSrc:undefined});
   }
 
   render = () => {
@@ -320,7 +326,7 @@ class Studio extends Component {
               <img className="icon" src={editIcon} alt="edit" />
             </span>
             <button className="button" onClick={this.saveAnim}>Save</button>
-            <button className="button" onClick={this.exportAnim}>Export</button>
+            <button className="button" onClick={this.previewAnim}>Preview</button>
             <p>&nbsp;{ this.state.message }</p>
           </div>
           <div className="flex-container">
@@ -346,7 +352,7 @@ class Studio extends Component {
               <button className="button" onClick={this.clearLayer}>Clear</button>
             </div>
             <div className="view">
-              <table>
+              <table className="bordered">
                 <tbody>
                   { view.map((row, y) =>
                   <tr key={y}>
@@ -398,7 +404,10 @@ class Studio extends Component {
                 <button className="button" onClick={this.addLayer}>Add Layer</button>
                 <button className="button" onClick={this.deleteLayer}>Delete Layer</button>
               </div>
-              { this.state.generatedGifSrc ? [<p>Preview</p>,<img className="preview" src={this.state.generatedGifSrc} alt="generated gif" />] : [] }
+              { this.state.generatedGifSrc ? 
+              [<p>Preview</p>,
+              <img className="preview" src={this.state.generatedGifSrc} alt="generated gif" />,
+              <button className="button" onClick={this.stopGif}>Stop</button>] : [] }
             </div>
           </div>
         </div>

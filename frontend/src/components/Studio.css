@@ -33,5 +33,6 @@
 }
 
 .preview {
-  width: 100px;
+  display: block;
+  width: 200px;
 }
