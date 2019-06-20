@@ -195,7 +195,6 @@ class Studio extends Component {
           'Content-Type': 'multipart/form-data'
         }
       })
-        .then (res => console.log('sent data', res));
     });
     gif.render();
 
@@ -275,8 +274,8 @@ class Studio extends Component {
     this.setState({anim:newAnim, activeFrame:newFrame});
   }
 
-  templateChange = (value) => {
-    this.setState({useFrameTemplate:value});
+  templateChange = (e) => {
+    this.setState({useFrameTemplate:e.target.checked});
   }
 
   addLayer = () => {
@@ -454,11 +453,11 @@ class Studio extends Component {
                 <button className="button" onClick={this.deleteFrame}>Delete Frame</button>
               </div>
               <div className="flex-sides">
-              <label><input type="checkbox" onChange={this.templateChange} checked />Use previous frame as template</label>
+                <label><input type="checkbox" onChange={this.templateChange} />Use previous frame as template</label>
               </div>
               <h2>Layer Controller</h2>
               { this.state.anim.frames[this.state.activeFrame].layers.map((layer, i) => (
-                <LayerCard
+              <LayerCard
                 key={i}
                 activeLayer={this.state.activeLayer+1}
                 layerNum={i+1}
