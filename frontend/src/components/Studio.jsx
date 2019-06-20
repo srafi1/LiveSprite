@@ -231,26 +231,30 @@ class Studio extends Component {
   }
 
   addFrame = () => {
-    let newFrame = {
-      layers: [{
-        pixels: [],
-        visible: true
-      }]
-    };
-    for (let i = 0; i < 16; i++) {
-      let row = [];
-      for (let j = 0; j < 16; j++) {
-        row.push({
-          r: 0,
-          g: 0,
-          b: 0,
-          visible: false
-        });
-      }
-      newFrame.layers[0].pixels.push(row);
-    }
+    let original = this.state.anim.frames[this.state.activeFrame];
+    let copiedFrame = JSON.parse(JSON.stringify(original));
+    /*
+     *let newFrame = {
+     *  layers: [{
+     *    pixels: [],
+     *    visible: true
+     *  }]
+     *};
+     *for (let i = 0; i < 16; i++) {
+     *  let row = [];
+     *  for (let j = 0; j < 16; j++) {
+     *    row.push({
+     *      r: 0,
+     *      g: 0,
+     *      b: 0,
+     *      visible: false
+     *    });
+     *  }
+     *  newFrame.layers[0].pixels.push(row);
+     *}
+     */
     let newAnim = { ...this.state.anim };
-    newAnim.frames.push(newFrame);
+    newAnim.frames.splice(this.state.activeFrame+1, 0, copiedFrame);
     this.setState({anim:newAnim, activeFrame:this.state.activeFrame+1});
   }
 
