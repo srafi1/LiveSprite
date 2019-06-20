@@ -1,17 +1,20 @@
-create table user (
-    user_id int auto_increment, 
-    username varchar(20) not null, 
-    password varchar(20) not null, 
-    primary key (user_id)
+CREATE DATABASE hibernatedb;
+USE hibernatedb;
+
+CREATE TABLE user (
+    user_id INT AUTO_INCREMENT, 
+    username VARCHAR(20) NOT NULL, 
+    password VARCHAR(20) NOT NULL, 
+    PRIMARY KEY (user_id)
 );
 
-create table animation (
-    id int auto_increment,
-    user_id int not null,
-    name varchar(20) not null,
-    data text not null,
+CREATE TABLE animation (
+    id INT AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    name VARCHAR(20) NOT NULL,
+    data TEXT NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT
     FOREIGN KEY (user_id)
     REFERENCES user (user_id)
-) engine=InnoDB;
+) ENGINE=InnoDB;
