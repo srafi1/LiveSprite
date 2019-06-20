@@ -83,7 +83,7 @@ public class App {
         server.get("/api/login", ctx -> {
             String username = ctx.fromString("username");
             String password = ctx.fromString("password");
-            System.out.println("Attempted login with: " + username + ", " + password);
+            System.out.println("attempted login with: " + username + ", " + password);
             Session session = sessionFactory.openSession();
             Criteria criteria = session.createCriteria(User.class);
             criteria.add(Restrictions.eq("username", username));
@@ -214,8 +214,6 @@ public class App {
                     byte[] bytes = blob.getBytes(1, (int) blob.length());
                     // send byte array in response
                     ctx.body(ByteBody.of(bytes));
-                    System.out.println("ANIM ID SHOULD BE: " + aid);
-                    System.out.println("ANIM ID: " + anim.getId());
                 } catch (SQLException e) { }
             }
             session.close();
