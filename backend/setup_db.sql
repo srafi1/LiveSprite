@@ -13,6 +13,7 @@ CREATE TABLE animation (
     user_id INT NOT NULL,
     name VARCHAR(20) NOT NULL,
     data TEXT NOT NULL,
+    gif BLOB,
     PRIMARY KEY (id),
     CONSTRAINT
     FOREIGN KEY (user_id)

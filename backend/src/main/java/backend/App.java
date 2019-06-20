@@ -1,6 +1,8 @@
 package backend;
 
 import com.blade.Blade;
+import com.blade.mvc.http.Body;
+import com.blade.mvc.http.ByteBody;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -9,8 +11,13 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.engine.jdbc.BlobProxy;
 
 import java.util.List;
+
+import java.io.File;
+import java.sql.Blob;
+import java.sql.SQLException;
 
 public class App {
 
@@ -172,6 +179,56 @@ public class App {
                 session.beginTransaction();
                 anim.setData(data);
                 anim.setName(animName);
+                session.save(anim);
+                session.getTransaction().commit();
+                ctx.json("Saved successfully");
+            }
+            session.close();
+        });
+
+        server.get("/api/gif/animation/:anim_id", ctx -> {
+            long uid = Long.parseLong(ctx.cookie("user_id"));
+            long animId = ctx.pathLong(":anim_id");
+            Session session = sessionFactory.openSession();
+            Criteria criteria = session.createCriteria(Animation.class);
+            criteria.add(Restrictions.eq("id", animId));
+            List<Animation> results = criteria.list();
+            Animation anim = results.get(0);
+            if (anim.getOwner().getId() != uid) {
+                ctx.text("Must own project");
+            } else {
+                ctx.contentType("image/gif");
+                Blob blob = anim.getGif();
+                try {
+                    // turn blob into byte array (from start to end)
+                    byte[] bytes = blob.getBytes(1, (int) blob.length());
+                    // send byte array in response
+                    ctx.body(ByteBody.of(bytes));
+                } catch (SQLException e) { }
+            }
+            session.close();
+        });
+
+        server.post("/api/gif/animation/:anim_id", ctx -> {
+            long uid = Long.parseLong(ctx.cookie("user_id"));
+            long animId = ctx.pathLong(":anim_id");
+            Session session = sessionFactory.openSession();
+            Criteria criteria = session.createCriteria(Animation.class);
+            criteria.add(Restrictions.eq("id", animId));
+            List<Animation> results = criteria.list();
+            Animation anim = results.get(0);
+            if (anim.getOwner().getId() != uid) {
+                ctx.json("Must own project to save");
+            } else {
+                session.beginTransaction();
+                ctx.request().fileItem("image").ifPresent(fileItem -> {
+                    // if the file exists, create a blob using the file's byte array
+                    // turn fileitem into a byte array
+                    byte[] bytes = fileItem.getData();
+                    // create a blob out of the byte array
+                    Blob blob = BlobProxy.generateProxy(bytes);
+                    anim.setGif(blob);
+                });
                 session.save(anim);
                 session.getTransaction().commit();
                 ctx.json("Saved successfully");

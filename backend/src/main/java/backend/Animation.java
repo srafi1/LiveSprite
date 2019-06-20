@@ -1,5 +1,7 @@
 package backend;
 
+import java.sql.Blob;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -27,6 +29,9 @@ public class Animation {
 
     @Column(name="data")
     private String data;
+
+    @Column(name="gif")
+    private Blob gif;
 
     public Animation() {  }
 
@@ -66,6 +71,14 @@ public class Animation {
 
     public void setData(String ndata) {
         this.data = ndata;
+    }
+
+    public Blob getGif() {
+        return gif;
+    }
+
+    public void setGif(Blob ngif) {
+        this.gif = ngif;
     }
 
     public String getJSON() {

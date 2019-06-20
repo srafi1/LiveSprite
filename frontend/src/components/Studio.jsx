@@ -187,7 +187,16 @@ class Studio extends Component {
     gif.on('finished', (blob) => {
       let url = URL.createObjectURL(blob);
       this.setState({generatedGifSrc:url});
-      // TODO: send gif file to server and save
+      var formData = new FormData();
+      formData.append("image", blob);
+      console.log(blob);
+      console.log(formData.forEach((c) => console.log(c)));
+      axios.post(`/api/gif/animation/${this.props.match.params.id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+        .then (res => console.log('sent data', res));
     });
     gif.render();
 

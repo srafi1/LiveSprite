@@ -13,6 +13,7 @@ class AnimationCard extends Component {
   render = () => {
     return (
       <div className="animation-card">
+        <img src={`/api/gif/animation/${this.props.animId}`} alt="animation preview" />
         <p>{ this.props.animName }</p>
         <Link className="button" to={`/studio/${this.props.animId}`}>Edit</Link>
         <button className="button" onClick={this.deleteAnim(this.props.animId)}>Delete</button>
