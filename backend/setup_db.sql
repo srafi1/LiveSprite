@@ -12,7 +12,7 @@ CREATE TABLE animation (
     id INT AUTO_INCREMENT,
     user_id INT NOT NULL,
     name VARCHAR(20) NOT NULL,
-    data TEXT NOT NULL,
+    data MEDIUMTEXT NOT NULL,
     gif BLOB,
     PRIMARY KEY (id),
     CONSTRAINT
