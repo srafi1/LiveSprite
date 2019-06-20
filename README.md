@@ -14,7 +14,7 @@ $ npm start
 
 ## Backend
 
-Made with Java:
+Made with Java 8:
 - Blade Framework for routing
 - Hibernate for ORM
 - MySQL for database
