@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router-dom';
+import generateGIF from '../utilities/gif';
 
 class NewProject extends Component {
   constructor(props) {
@@ -33,17 +34,35 @@ class NewProject extends Component {
       }
       anim.frames[0].layers[0].pixels.push(row);
     }
+    anim.fps = 1;
 
     axios.post('/api/new', anim)
       .then(res => res.data)
       .then(res => {
         this.setState({loading:false});
         if (res.success) {
-          this.setState({animId:res.anim_id});
+          this.setState({animIdTemp:res.anim_id});
         } else {
           this.setState({error:res.warning});
         }
-      });
+      })
+      .then(() => {
+        let gif = generateGIF(anim);
+        gif.on('finished', (blob) => {
+          let url = URL.createObjectURL(blob);
+          this.setState({generatedGifSrc:url});
+          var formData = new FormData();
+          formData.append("image", blob);
+          console.log(this.state.animIdTemp);
+          axios.post(`/api/gif/animation/${this.state.animIdTemp}`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          })
+            .then (res => this.setState({animId:this.state.animIdTemp}));
+        });
+        gif.render();
+      })
   }
 
   render = () => {

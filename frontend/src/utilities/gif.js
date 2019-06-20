@@ -75,6 +75,7 @@ const generateImageFromView = (view) => {
 
 const generateGIF = (anim) => {
   let scale = 8;
+  let fps = anim.fps;
   let gif = new GIF({
     workers: 4,
     quality: 0,
@@ -87,7 +88,9 @@ const generateGIF = (anim) => {
   for (let i = 0; i < anim.frames.length; i++) {
     let view = generateViewFromFrame(anim.frames[i], scale);
     let image = generateImageFromView(view);
-    gif.addFrame(image);
+    gif.addFrame(image, {
+      delay: 1000/fps
+    });
   }
 
   return gif;

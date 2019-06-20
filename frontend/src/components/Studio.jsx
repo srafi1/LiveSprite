@@ -189,8 +189,6 @@ class Studio extends Component {
       this.setState({generatedGifSrc:url});
       var formData = new FormData();
       formData.append("image", blob);
-      console.log(blob);
-      console.log(formData.forEach((c) => console.log(c)));
       axios.post(`/api/gif/animation/${this.props.match.params.id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -224,6 +222,12 @@ class Studio extends Component {
 
   frameChange = (value) => {
     this.setState({activeFrame:value});
+  }
+
+  fpsChange = (value) => {
+    let newAnim = { ...this.state.anim };
+    newAnim.fps = value;
+    this.setState({anim:newAnim});
   }
 
   addFrame = () => {
@@ -415,6 +419,15 @@ class Studio extends Component {
             </div>
             <div className="panel">
               <h2>Frame Controller</h2>
+              <Slider
+                min={1}
+                max={24}
+                value={this.state.anim.fps}
+                onChange={this.fpsChange}
+              />
+              <div className="flex-sides">
+                <span>FPS: {this.state.anim.fps}</span>
+              </div>
               <Slider
                 min={0}
                 max={this.state.anim.frames.length-1}
