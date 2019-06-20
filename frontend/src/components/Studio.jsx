@@ -183,6 +183,14 @@ class Studio extends Component {
   }
 
   saveAnim = () => {
+    let gif = generateGIF(this.state.anim);
+    gif.on('finished', (blob) => {
+      let url = URL.createObjectURL(blob);
+      this.setState({generatedGifSrc:url});
+      // TODO: send gif file to server and save
+    });
+    gif.render();
+
     axios.post(`/api/animation/${this.props.match.params.id}/${this.state.anim.name}`, this.state.anim)
       .then(res => res.data)
       .then(res => {
@@ -294,7 +302,8 @@ class Studio extends Component {
     this.setState({activeLayer:i});
   }
 
-  moveLayerUp = (i) => () => {
+  moveLayerUp = (i) => (e) => {
+    e.stopPropagation();
     if (i === 0) {
       return;
     }
@@ -305,7 +314,8 @@ class Studio extends Component {
     this.setState({anim:newAnim});
   }
 
-  moveLayerDown = (i) => () => {
+  moveLayerDown = (i) => (e) => {
+    e.stopPropagation();
     if (i === this.state.anim.frames[this.state.activeFrame].layers.length-1) {
       return;
     }
@@ -319,15 +329,14 @@ class Studio extends Component {
   previewAnim = () => {
     let gif = generateGIF(this.state.anim);
     gif.on('finished', (blob) => {
-      console.log('completed gif generation');
       let url = URL.createObjectURL(blob);
-      this.setState({generatedGifSrc:url});
+      this.setState({generatedGifSrc:url, previewGif:true});
     });
     gif.render();
   }
 
   stopGif = () => {
-    this.setState({generatedGifSrc:undefined});
+    this.setState({previewGif:false});
   }
 
   render = () => {
@@ -428,7 +437,7 @@ class Studio extends Component {
                 <button className="button" onClick={this.addLayer}>Add Layer</button>
                 <button className="button" onClick={this.deleteLayer}>Delete Layer</button>
               </div>
-              { this.state.generatedGifSrc ? 
+              { this.state.previewGif ? 
               <div>
                 <h2>Preview</h2>
                 <img className="preview" src={this.state.generatedGifSrc} alt="generated gif" />

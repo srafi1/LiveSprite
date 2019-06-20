@@ -140,6 +140,22 @@ public class App {
             }
         });
 
+        server.delete("/api/animation/:anim_id", ctx -> {
+            long uid = Long.parseLong(ctx.cookie("user_id"));
+            long animId = ctx.pathLong(":anim_id");
+            Session session = sessionFactory.openSession();
+            Criteria criteria = session.createCriteria(Animation.class);
+            criteria.add(Restrictions.eq("id", animId));
+            List<Animation> results = criteria.list();
+            Animation anim = results.get(0);
+            if (anim.getOwner().getId() == uid) {
+                session.beginTransaction();
+                session.delete(anim);
+                session.getTransaction().commit();
+            }
+            session.close();
+        });
+
         server.post("/api/animation/:anim_id/:new_anim_name", ctx -> {
             long uid = Long.parseLong(ctx.cookie("user_id"));
             long animId = ctx.pathLong(":anim_id");
