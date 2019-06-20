@@ -11,6 +11,7 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Order;
 import org.hibernate.engine.jdbc.BlobProxy;
 
 import java.util.List;
@@ -18,6 +19,9 @@ import java.util.List;
 import java.io.File;
 import java.sql.Blob;
 import java.sql.SQLException;
+
+import java.util.stream.Collectors;
+import java.util.Collections;
 
 public class App {
 
@@ -121,10 +125,12 @@ public class App {
             Session session = sessionFactory.openSession();
             Criteria criteria = session.createCriteria(User.class);
             criteria.add(Restrictions.eq("id", uid));
+            criteria.addOrder(Order.asc("id"));
             List<User> results = criteria.list();
-            //Animation[] anims = results.get(0).getAnimations().toArray();
             String response = "[ ";
-            for (Animation anim : results.get(0).getAnimations()) {
+            List<Animation> anims = results.get(0).getAnimations().stream().collect(Collectors.toList());
+            Collections.sort(anims, (o1, o2) -> (int) (o1.getId() - o2.getId()));
+            for (Animation anim : anims) {
                 response += anim.getJSON() + ",";
             }
             response = response.substring(0, response.length()-1) + "]";
@@ -188,10 +194,14 @@ public class App {
 
         server.get("/api/gif/animation/:anim_id", ctx -> {
             long uid = Long.parseLong(ctx.cookie("user_id"));
-            long animId = ctx.pathLong(":anim_id");
+            // ctx.pathLong sometimes gives the wrong output
+            //long animId = ctx.pathLong(":anim_id");
+            String uri = ctx.uri();
+            String[] parts = uri.split("/");
+            String aid = parts[parts.length - 1];
             Session session = sessionFactory.openSession();
             Criteria criteria = session.createCriteria(Animation.class);
-            criteria.add(Restrictions.eq("id", animId));
+            criteria.add(Restrictions.eq("id", Long.parseLong(aid)));
             List<Animation> results = criteria.list();
             Animation anim = results.get(0);
             if (anim.getOwner().getId() != uid) {
@@ -204,6 +214,8 @@ public class App {
                     byte[] bytes = blob.getBytes(1, (int) blob.length());
                     // send byte array in response
                     ctx.body(ByteBody.of(bytes));
+                    System.out.println("ANIM ID SHOULD BE: " + aid);
+                    System.out.println("ANIM ID: " + anim.getId());
                 } catch (SQLException e) { }
             }
             session.close();
