@@ -430,7 +430,7 @@ class Studio extends Component {
               </div>
               { this.state.generatedGifSrc ? 
               <div>
-                <p>Preview</p>
+                <h2>Preview</h2>
                 <img className="preview" src={this.state.generatedGifSrc} alt="generated gif" />
                 <a className="button" href={this.state.generatedGifSrc} target="_blank" rel="noopener noreferrer">Export</a>
                 <button className="button" onClick={this.stopGif}>Stop</button>
