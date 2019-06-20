@@ -429,9 +429,12 @@ class Studio extends Component {
                 <button className="button" onClick={this.deleteLayer}>Delete Layer</button>
               </div>
               { this.state.generatedGifSrc ? 
-              [<p>Preview</p>,
-              <img className="preview" src={this.state.generatedGifSrc} alt="generated gif" />,
-              <button className="button" onClick={this.stopGif}>Stop</button>] : [] }
+              <div>
+                <p>Preview</p>
+                <img className="preview" src={this.state.generatedGifSrc} alt="generated gif" />
+                <a className="button" href={this.state.generatedGifSrc} target="_blank" rel="noopener noreferrer">Export</a>
+                <button className="button" onClick={this.stopGif}>Stop</button>
+              </div> : [] }
             </div>
           </div>
         </div>

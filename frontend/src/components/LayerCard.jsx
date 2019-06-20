@@ -21,8 +21,8 @@ class LayerCard extends Component {
           onClick={this.props.toggleVisibility}
         />
         <span>Layer {this.props.layerNum}</span>
-        <button className="button" onClick={this.props.moveLayerUp}>Up</button>
-        <button className="button" onClick={this.props.moveLayerDown}>Down</button>
+        <button className="button bordered" onClick={this.props.moveLayerUp}>Up</button>
+        <button className="button bordered" onClick={this.props.moveLayerDown}>Down</button>
       </div>
       );
   }

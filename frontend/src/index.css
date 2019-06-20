@@ -39,6 +39,11 @@ nav a:hover {
   text-decoration: none;
   cursor: pointer;
   border: none;
+  font-size: 1em;
+}
+
+.button.bordered {
+  border: 1px solid white;
 }
 
 .button:hover {
