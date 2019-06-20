@@ -1,18 +1,22 @@
 import GIF from 'gif.js';
 
-const generateViewFromFrame = (frame) => {
+const generateViewFromFrame = (frame, scale) => {
   let view = [];
   for (let i = 0; i < 16; i++) {
     let row = [];
     for (let j = 0; j < 16; j++) {
-      row.push({
-        visible: false,
-        r: 0,
-        g: 0,
-        b: 0
-      });
+      for (let h = 0; h < scale; h++) {
+        row.push({
+          visible: false,
+          r: 0,
+          g: 0,
+          b: 0
+        });
+      }
     }
-    view.push(row);
+    for (let h = 0; h < scale; h++) {
+      view.push(row);
+    }
   }
   /*
    *console.log('view init');
@@ -25,12 +29,15 @@ const generateViewFromFrame = (frame) => {
    */
   for (let i = 0; i < frame.layers.length; i++) {
     let layer = frame.layers[i];
-    if (!layer.visible) continue;
     layer = layer.pixels;
     for (let y = 0; y < layer.length; y++) {
       for (let x = 0; x < layer.length; x++) {
-        if (!view[y][x].visible) {
-          view[y][x] = layer[y][x];
+        for (let i = 0; i < scale; i++) {
+          for (let j = 0; j < scale; j++) {
+            if (!view[y*scale+j][x*scale+i].visible) {
+              view[y*scale+j][x*scale+i] = layer[y][x];
+            }
+          }
         }
       }
     }
@@ -46,30 +53,39 @@ const generateViewFromFrame = (frame) => {
 const generateImageFromView = (view) => {
   let c = document.createElement('canvas');
   let ctx = c.getContext('2d');
-  let imgData = ctx.createImageData(16, 16);
-  for (let y = 0; y < 16; y++) {
-    for (let x = 0; x < 16; x++) {
-      imgData.data[y*16*4+x*4+0] = view[y][x].r;
-      imgData.data[y*16*4+x*4+1] = view[y][x].g;
-      imgData.data[y*16*4+x*4+2] = view[y][x].b;
-      imgData.data[y*16*4+x*4+3] = (view[y][x].visible ? 255 : 0);
+  let imgData = ctx.createImageData(view.length, view.length);
+  for (let y = 0; y < view.length; y++) {
+    for (let x = 0; x < view[y].length; x++) {
+      if (view[y][x].visible) {
+        // add 10 to fix black -> transparent bug
+        imgData.data[y*view.length*4+x*4+0] = Math.min(view[y][x].r + 10, 255);
+        imgData.data[y*view.length*4+x*4+1] = view[y][x].g;
+        imgData.data[y*view.length*4+x*4+2] = view[y][x].b;
+        imgData.data[y*view.length*4+x*4+3] = 255;
+      } else {
+        imgData.data[y*view.length*4+x*4+0] = 0;
+        imgData.data[y*view.length*4+x*4+1] = 0;
+        imgData.data[y*view.length*4+x*4+2] = 0;
+        imgData.data[y*view.length*4+x*4+3] = 0;
+      }
     }
   }
-  ctx.putImageData(imgData, 0, 0);
-  return ctx;
+  return imgData;
 }
 
 const generateGIF = (anim) => {
+  let scale = 8;
   let gif = new GIF({
-    workers: 2,
+    workers: 4,
     quality: 0,
-    width: 16,
-    height: 16,
+    width: 16*scale,
+    height: 16*scale,
+    transparent: 'rgba(0, 0, 0, 0)',
     workerScript: '/gif.worker.js'
   });
 
   for (let i = 0; i < anim.frames.length; i++) {
-    let view = generateViewFromFrame(anim.frames[i]);
+    let view = generateViewFromFrame(anim.frames[i], scale);
     let image = generateImageFromView(view);
     gif.addFrame(image);
   }
