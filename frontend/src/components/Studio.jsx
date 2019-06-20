@@ -27,6 +27,7 @@ class Studio extends Component {
           anim: res.animation,
           activeFrame: 0,
           activeLayer: 0,
+          useFrameTemplate: true,
           activeTool: 'Pencil',
           color: {
             r: 0,
@@ -231,30 +232,32 @@ class Studio extends Component {
   }
 
   addFrame = () => {
-    let original = this.state.anim.frames[this.state.activeFrame];
-    let copiedFrame = JSON.parse(JSON.stringify(original));
-    /*
-     *let newFrame = {
-     *  layers: [{
-     *    pixels: [],
-     *    visible: true
-     *  }]
-     *};
-     *for (let i = 0; i < 16; i++) {
-     *  let row = [];
-     *  for (let j = 0; j < 16; j++) {
-     *    row.push({
-     *      r: 0,
-     *      g: 0,
-     *      b: 0,
-     *      visible: false
-     *    });
-     *  }
-     *  newFrame.layers[0].pixels.push(row);
-     *}
-     */
+    let newFrame;
+    if (this.state.useFrameTemplate) {
+      let original = this.state.anim.frames[this.state.activeFrame];
+      newFrame = JSON.parse(JSON.stringify(original));
+    } else {
+      newFrame = {
+        layers: [{
+          pixels: [],
+          visible: true
+        }]
+      };
+      for (let i = 0; i < 16; i++) {
+        let row = [];
+        for (let j = 0; j < 16; j++) {
+          row.push({
+            r: 0,
+            g: 0,
+            b: 0,
+            visible: false
+          });
+        }
+        newFrame.layers[0].pixels.push(row);
+      }
+    }
     let newAnim = { ...this.state.anim };
-    newAnim.frames.splice(this.state.activeFrame+1, 0, copiedFrame);
+    newAnim.frames.splice(this.state.activeFrame+1, 0, newFrame);
     this.setState({anim:newAnim, activeFrame:this.state.activeFrame+1});
   }
 
@@ -270,6 +273,10 @@ class Studio extends Component {
       newFrame = 0;
     }
     this.setState({anim:newAnim, activeFrame:newFrame});
+  }
+
+  templateChange = (value) => {
+    this.setState({useFrameTemplate:value});
   }
 
   addLayer = () => {
@@ -445,6 +452,9 @@ class Studio extends Component {
               <div className="flex-sides">
                 <button className="button" onClick={this.addFrame}>Add Frame</button>
                 <button className="button" onClick={this.deleteFrame}>Delete Frame</button>
+              </div>
+              <div className="flex-sides">
+              <label><input type="checkbox" onChange={this.templateChange} checked />Use previous frame as template</label>
               </div>
               <h2>Layer Controller</h2>
               { this.state.anim.frames[this.state.activeFrame].layers.map((layer, i) => (
