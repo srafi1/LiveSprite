@@ -220,6 +220,16 @@ class Studio extends Component {
     }
   }
 
+  fillLayer = () => {
+    let frame = this.state.anim.frames[this.state.activeFrame];
+    let layer = frame.layers[this.state.activeLayer].pixels;
+    for (let y = 0; y < layer.length; y++) {
+      for (let x = 0; x < layer.length; x++) {
+        this.fillCell(x, y);
+      }
+    }
+  }
+
   frameChange = (value) => {
     this.setState({activeFrame:value});
   }
@@ -403,7 +413,10 @@ class Studio extends Component {
                 activeTool={this.state.activeTool}
                 onClick={this.changeTool}
               />
-              <button className="button" onClick={this.clearLayer}>Clear</button>
+              <div className="flex-container">
+                <button className="button" onClick={this.fillLayer}>Fill</button>
+                <button className="button" onClick={this.clearLayer}>Clear</button>
+              </div>
             </div>
             <div className="view">
               <table className="bordered">
