@@ -466,7 +466,7 @@ class Studio extends Component {
                 <button className="button" onClick={this.deleteFrame}>Delete Frame</button>
               </div>
               <div className="flex-sides">
-                <label><input type="checkbox" onChange={this.templateChange} />Use previous frame as template</label>
+                <label><input type="checkbox" onChange={this.templateChange} checked={this.state.useFrameTemplate} />Use previous frame as template</label>
               </div>
               <h2>Layer Controller</h2>
               { this.state.anim.frames[this.state.activeFrame].layers.map((layer, i) => (
