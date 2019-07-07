@@ -1,6 +1,8 @@
 # LiveSprite
 Pixel art animator 
 
+This project is hosted at [https://livesprite.herokuapp.com/](https://livesprite.herokuapp.com/)
+
 ## Frontend
 
 Made with React
