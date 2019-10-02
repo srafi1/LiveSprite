@@ -1,11 +1,16 @@
 const express = require('express');
-const router = require('./router');
 const mongoose = require('mongoose');
 
+const router = require('./router');
 const User = require('./models/User');
 
-const app = express();
 const PORT = 5000;
+const app = express();
+
+mongoose.connect('mongodb://localhost:27017/livespriteAPI', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 app.use('/api', router);
 
