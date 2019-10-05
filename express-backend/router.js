@@ -151,11 +151,11 @@ router.delete('/animation/:animId', (req, res) => {
         let animIndex = -1;
         for (let i in user.animations) {
           if (user.animations[i]._id == animId) {
-            animId = i;
+            animIndex = i;
             break;
           }
         }
-        if (i === -1) {
+        if (animIndex === -1) {
           res.json({success: false, warning: 'Unauthorized or animation does not exist'});
         } else {
           user.animations.splice(animIndex, 1);
@@ -170,7 +170,37 @@ router.delete('/animation/:animId', (req, res) => {
 })
 
 router.post('/animation/:animId/:newAnimName', (req, res) => {
-  res.send('saving animation')
+  let uid = req.cookies['user_id'];
+  let animId = req.params['animId'];
+  let newAnimName = req.params['newAnimName'];
+  if (!uid) {
+    res.json('No user id found');
+  } else {
+    User.findOne({username: uid}, (err, user) => {
+      if (!user) {
+        res.json('Must own project to save');
+      } else {
+        let animIndex = -1;
+        for (let i in user.animations) {
+          console.log(user.animations[i]);
+          if (user.animations[i]._id == animId) {
+            animIndex = i;
+            break;
+          }
+        }
+        if (animIndex === -1) {
+          res.json({success: false, warning: 'Unauthorized or animation does not exist'});
+        } else {
+          user.animations[animIndex].name = newAnimName;
+          user.animations[animIndex].data = req.body;
+          user.save()
+            .then(() => {
+              res.json('Saved successfully');
+            });
+        }
+      }
+    });
+  }
 })
 
 router.get('/gif/animation/:animId', (req, res) => {
