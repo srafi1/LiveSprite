@@ -95,8 +95,49 @@ router.post('/new', (req, res) => {
   }
 })
 
+router.get('/animations', (req, res) => {
+  let uid = req.cookies['user_id'];
+  if (!uid) {
+    res.json({success: false, warning: 'No user id found'});
+  } else {
+    User.findOne({username: uid}, (err, user) => {
+      if (!user) {
+        res.json({success: false, warning: 'That user does not exist'});
+      } else {
+        let anims = user.animations.map((a) => {return {id: a._id, name: a.name};});
+        res.json(anims);
+      }
+    });
+  }
+})
+
 router.get('/animation/:animId', (req, res) => {
-  res.send('getting old animation');
+  let uid = req.cookies['user_id'];
+  let animId = req.params['animId'];
+  if (!uid) {
+    res.json({success: false, warning: 'No user id found'});
+  } else {
+    User.findOne({username: uid}, (err, user) => {
+      if (!user) {
+        res.json({success: false, warning: 'That user does not exist'});
+      } else {
+        let anim = null;
+        for (let i in user.animations) {
+          console.log(user.animations[i]);
+          console.log(typeof(user.animations[0]._id));
+          if (user.animations[i]._id == animId) {
+            anim = user.animations[i];
+            break;
+          }
+        }
+        if (!anim) {
+          res.json({success: false, warning: 'Unauthorized or animation does not exist'});
+        } else {
+          res.json({success: true, animation: anim});
+        }
+      }
+    });
+  }
 })
 
 router.delete('/animation/:animId', (req, res) => {
