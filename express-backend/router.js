@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const cookieParser = require('cookie-parser');
+const fs = require('fs');
 
 const User = require('./models/User');
 
@@ -12,6 +13,13 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true })); 
 router.use(upload.array());
 router.use(cookieParser());
+/*
+ *router.use(multer({ dest: './uploads/',
+ *  rename: function (fieldname, filename) {
+ *    return filename;
+ *  }
+ *}));
+ */
 
 router.get('/', (req, res) => {
   res.send('LiveSprite API');
@@ -204,11 +212,64 @@ router.post('/animation/:animId/:newAnimName', (req, res) => {
 })
 
 router.get('/gif/animation/:animId', (req, res) => {
-  res.send('getting animation gif file');
+  let uid = req.cookies['user_id'];
+  let animId = req.params['animId'];
+  if (!uid) {
+    res.json('No user id found');
+  } else {
+    User.findOne({username: uid}, (err, user) => {
+      if (!user) {
+        res.json('Must own project to save');
+      } else {
+        let animIndex = -1;
+        for (let i in user.animations) {
+          console.log(user.animations[i]);
+          if (user.animations[i]._id == animId) {
+            animIndex = i;
+            break;
+          }
+        }
+        if (animIndex === -1) {
+          res.json({success: false, warning: 'Unauthorized or animation does not exist'});
+        } else {
+          res.contentType('image/gif');
+          res.send(user.animations[animIndex].gif);
+        }
+      }
+    });
+  }
 })
 
 router.post('/gif/animation/:animId', (req, res) => {
-  res.send('saving animation gif file');
+  let uid = req.cookies['user_id'];
+  let animId = req.params['animId'];
+  if (!uid) {
+    res.json('No user id found');
+  } else {
+    User.findOne({username: uid}, (err, user) => {
+      if (!user) {
+        res.json('Must own project to save');
+      } else {
+        let animIndex = -1;
+        for (let i in user.animations) {
+          console.log(user.animations[i]);
+          if (user.animations[i]._id == animId) {
+            animIndex = i;
+            break;
+          }
+        }
+        if (animIndex === -1) {
+          res.json({success: false, warning: 'Unauthorized or animation does not exist'});
+        } else {
+          user.animations[animIndex].gif = fs.readFileSync(req.files.image.path);
+          user.save()
+            .then(() => {
+              res.json('Saved successfully');
+            });
+        }
+      }
+    });
+  }
 })
 
 module.exports = router;
