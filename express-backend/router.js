@@ -6,20 +6,16 @@ const fs = require('fs');
 
 const User = require('./models/User');
 
-const upload = multer();
+const upload = multer({ dest: './uploads/',
+ rename: function (fieldname, filename) {
+   return filename;
+ },
+});
 const router = express.Router();
 
 router.use(bodyParser.json()); 
 router.use(bodyParser.urlencoded({ extended: true })); 
-router.use(upload.array());
 router.use(cookieParser());
-/*
- *router.use(multer({ dest: './uploads/',
- *  rename: function (fieldname, filename) {
- *    return filename;
- *  }
- *}));
- */
 
 router.get('/', (req, res) => {
   res.send('LiveSprite API');
@@ -27,9 +23,9 @@ router.get('/', (req, res) => {
 
 router.get('/register', (req, res) => {
   // get form inputs
-  let username = req.body['username'];
-  let password = req.body['password'];
-  let confirmPassword = req.body['confirmPassword'];
+  let username = req.query['username'];
+  let password = req.query['password'];
+  let confirmPassword = req.query['confirmPassword'];
 
   // form validation
   if (!username || username.trim() === '') {
@@ -60,8 +56,8 @@ router.get('/register', (req, res) => {
 
 router.get('/login', (req, res) => {
   // get form inputs
-  let username = req.body['username'];
-  let password = req.body['password'];
+  let username = req.query['username'];
+  let password = req.query['password'];
 
   // form validation
   if (!username || username.trim() === '') {
@@ -139,7 +135,7 @@ router.get('/animation/:animId', (req, res) => {
         if (!anim) {
           res.json({success: false, warning: 'Unauthorized or animation does not exist'});
         } else {
-          res.json({success: true, animation: anim});
+          res.json({success: true, animation: anim.data});
         }
       }
     });
@@ -190,7 +186,6 @@ router.post('/animation/:animId/:newAnimName', (req, res) => {
       } else {
         let animIndex = -1;
         for (let i in user.animations) {
-          console.log(user.animations[i]);
           if (user.animations[i]._id == animId) {
             animIndex = i;
             break;
@@ -223,7 +218,6 @@ router.get('/gif/animation/:animId', (req, res) => {
       } else {
         let animIndex = -1;
         for (let i in user.animations) {
-          console.log(user.animations[i]);
           if (user.animations[i]._id == animId) {
             animIndex = i;
             break;
@@ -240,7 +234,7 @@ router.get('/gif/animation/:animId', (req, res) => {
   }
 })
 
-router.post('/gif/animation/:animId', (req, res) => {
+router.post('/gif/animation/:animId', upload.single('image'), (req, res) => {
   let uid = req.cookies['user_id'];
   let animId = req.params['animId'];
   if (!uid) {
@@ -252,7 +246,6 @@ router.post('/gif/animation/:animId', (req, res) => {
       } else {
         let animIndex = -1;
         for (let i in user.animations) {
-          console.log(user.animations[i]);
           if (user.animations[i]._id == animId) {
             animIndex = i;
             break;
@@ -261,7 +254,7 @@ router.post('/gif/animation/:animId', (req, res) => {
         if (animIndex === -1) {
           res.json({success: false, warning: 'Unauthorized or animation does not exist'});
         } else {
-          user.animations[animIndex].gif = fs.readFileSync(req.files.image.path);
+          user.animations[animIndex].gif = fs.readFileSync(req.file.path);
           user.save()
             .then(() => {
               res.json('Saved successfully');
