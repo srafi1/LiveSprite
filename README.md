@@ -1,31 +1,31 @@
 # LiveSprite
 Pixel art animator 
 
-This project is hosted at [https://livesprite.herokuapp.com/](https://livesprite.herokuapp.com/)
+This project is hosted at [https://livesprite.shakilrafi.me/](https://livesprite.shakilrafi.me/)
 
 ## Frontend
 
 Made with React
 
-Run with:
+Build with (will be served through express):
 ```bash
 $ cd frontend
 $ npm i
-$ npm start
+$ npm run build
 ```
 
 ## Backend
 
-Made with Java 8:
-- Blade Framework for routing
-- Hibernate for ORM
-- MySQL for database
+Made with Node.js:
+- express for routing and middleware
+- Mongoose for ORM
+- MongoDB for database
 
-Make sure you have a MySQL server running locally with the username `root` and password `root` (or modify hibernate.cfg.xml with credentials to use)
+Make sure you have a MongoDB server running locally (this project will use the livespriteAPI db)
 
 Run with:
 ```bash
 $ cd backend
-$ mysql -u root -p < setup_db.sql
-$ gradle run
+$ npm i
+$ npm start
 ```
