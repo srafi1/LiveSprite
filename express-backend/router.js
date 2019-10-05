@@ -123,8 +123,6 @@ router.get('/animation/:animId', (req, res) => {
       } else {
         let anim = null;
         for (let i in user.animations) {
-          console.log(user.animations[i]);
-          console.log(typeof(user.animations[0]._id));
           if (user.animations[i]._id == animId) {
             anim = user.animations[i];
             break;
@@ -141,7 +139,34 @@ router.get('/animation/:animId', (req, res) => {
 })
 
 router.delete('/animation/:animId', (req, res) => {
-  res.send('deleting animation');
+  let uid = req.cookies['user_id'];
+  let animId = req.params['animId'];
+  if (!uid) {
+    res.json({success: false, warning: 'No user id found'});
+  } else {
+    User.findOne({username: uid}, (err, user) => {
+      if (!user) {
+        res.json({success: false, warning: 'That user does not exist'});
+      } else {
+        let animIndex = -1;
+        for (let i in user.animations) {
+          if (user.animations[i]._id == animId) {
+            animId = i;
+            break;
+          }
+        }
+        if (i === -1) {
+          res.json({success: false, warning: 'Unauthorized or animation does not exist'});
+        } else {
+          user.animations.splice(animIndex, 1);
+          user.save()
+            .then(() => {
+              res.json({success: true});
+            });
+        }
+      }
+    });
+  }
 })
 
 router.post('/animation/:animId/:newAnimName', (req, res) => {
