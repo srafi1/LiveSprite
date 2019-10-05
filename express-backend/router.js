@@ -75,7 +75,24 @@ router.get('/login', (req, res) => {
 })
 
 router.post('/new', (req, res) => {
-  res.send('creating new animation');
+  let uid = req.cookies['user_id'];
+  if (!uid) {
+    res.json({success: false, warning: 'No user id found'});
+  } else {
+    User.findOne({username: uid}, (err, user) => {
+      if (!user) {
+        res.json({success: false, warning: 'That user does not exist'});
+      } else {
+        let anim = {name: 'New Project', data: req.body};
+        user.animations.push(anim);
+        user.save()
+          .then(() => {
+            let anim_id = user.animations[user.animations.length - 1]._id;
+            res.json({success: true, anim_id: anim_id});
+          });
+      }
+    });
+  }
 })
 
 router.get('/animation/:animId', (req, res) => {
