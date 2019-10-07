@@ -29,3 +29,7 @@ $ cd backend
 $ npm i
 $ npm start
 ```
+
+### Note
+
+The backend was originally written in the Blade framework (Java) with a MySQL database and can be found in the `java-blade-backend` branch.
