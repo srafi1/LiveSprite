@@ -1,7 +1,7 @@
 # LiveSprite
 Pixel art animator 
 
-This project is hosted at [https://livesprite.shakilrafi.me/](https://livesprite.shakilrafi.me/)
+This project is hosted at [https://livesprite.shakilrafi.com](https://livesprite.shakilrafi.com)
 
 ## Frontend
 
@@ -18,7 +18,7 @@ $ npm run build
 
 Made with Node.js:
 - express for routing and middleware
-- Mongoose for ORM
+- Mongoose for ODM
 - MongoDB for database
 
 Make sure you have a MongoDB server running locally (this project will use the livespriteAPI db)
