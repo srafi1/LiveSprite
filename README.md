@@ -1,5 +1,6 @@
 # LiveSprite
-Pixel art animator 
+
+Pixel art animation web app
 
 This project is hosted at [https://livesprite.shakilrafi.com](https://livesprite.shakilrafi.com)
 
